@@ -1,0 +1,72 @@
+name: Deploy frontend to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build for Pages
+        working-directory: frontend
+        env:
+          # Repository name doubles as the Pages sub-path.
+          PAGES_BASE_HREF: /${{ github.event.repository.name }}/
+          PAGES_API_URL: ${{ vars.INKWELL_API_URL }}
+        run: npm run build -- --configuration production --base-href "$PAGES_BASE_HREF"
+
+      - name: Point the build at the deployed API
+        working-directory: frontend
+        env:
+          PAGES_API_URL: ${{ vars.INKWELL_API_URL }}
+        run: |
+          if [ -n "$PAGES_API_URL" ]; then
+            printf 'window.__INKWELL_API__ = "%s";\n' "$PAGES_API_URL" \
+              > dist/frontend/browser/config.js
+            echo "API base set to $PAGES_API_URL"
+          else
+            echo "::warning::Repository variable INKWELL_API_URL is unset; the app will call /api on the Pages origin."
+          fi
+
+      - name: SPA fallback and nojekyll
+        working-directory: frontend
+        run: |
+          cp dist/frontend/browser/index.html dist/frontend/browser/404.html
+          touch dist/frontend/browser/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist/frontend/browser
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
