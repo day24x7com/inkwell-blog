@@ -110,6 +110,28 @@ grace / password123
 
 ## Deploying
 
+### Live
+
+- **Frontend:** https://day24x7com.github.io/inkwell-blog/ (GitHub Pages)
+- **Images:** `ghcr.io/day24x7com/inkwell-api`, `ghcr.io/day24x7com/inkwell-web`
+
+The Pages build serves the UI; the API is not hosted there. To make the live
+frontend fully functional, deploy the backend and point it at the UI:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/day24x7com/inkwell-blog)
+
+1. Click the button above (or open `render.yaml` in the Render dashboard).
+   Render creates the API and a managed PostgreSQL instance together and
+   generates `SECRET_KEY` for you.
+2. Once the service is healthy, copy its URL (`https://<name>.onrender.com/api`)
+   into the repository variable **`INKWELL_API_URL`**
+   (*Settings → Secrets and variables → Actions → Variables*).
+3. Re-run the **Deploy frontend to GitHub Pages** workflow. It rewrites
+   `config.js`, so the Pages build calls your API instead of same-origin `/api`.
+
+Free Render instances sleep after inactivity, so the first request may take a
+few seconds.
+
 ### Docker Compose (single host / VPS)
 
 ```bash

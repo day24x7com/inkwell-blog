@@ -16,6 +16,20 @@ class Settings(BaseSettings):
     def origins(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
+    @property
+    def async_database_url(self) -> str:
+        """Normalize to the asyncpg driver.
+
+        Managed hosts (Render, Heroku, Railway) hand out `postgres://` or
+        `postgresql://` URLs, which SQLAlchemy would load with psycopg2 --
+        a driver this image does not ship.
+        """
+        url = self.database_url
+        for prefix in ("postgres://", "postgresql://"):
+            if url.startswith(prefix):
+                return "postgresql+asyncpg://" + url[len(prefix) :]
+        return url
+
 
 @lru_cache
 def get_settings() -> Settings:
