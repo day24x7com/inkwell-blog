@@ -58,9 +58,10 @@ jobs:
           done
 
       - name: Exercise the API
-        run: python -m scripts.smoke_test
+        working-directory: backend
         env:
           API_URL: http://127.0.0.1:8000/api
+        run: python -m scripts.smoke_test
 
   frontend:
     name: Frontend (build)
