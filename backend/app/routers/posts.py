@@ -25,14 +25,12 @@ async def _resolve_tags(db: AsyncSession, names: list[str]) -> list[Tag]:
     return resolved
 
 
-async def _unique_slug(db: AsyncSession, title: str, ignore_id: int | None = None) -> str:
+async def _unique_slug(db: AsyncSession, title: str) -> str:
     base = slugify(title)
     candidate, n = base, 1
     while True:
-        stmt = select(Post.id).where(Post.slug == candidate)
-        if ignore_id is not None:
-            stmt = stmt.where(Post.id != ignore_id)
-        if await db.scalar(stmt) is None:
+        exists = await db.scalar(select(Post.id).where(Post.slug == candidate))
+        if exists is None:
             return candidate
         n += 1
         candidate = f"{base}-{n}"
@@ -133,8 +131,8 @@ async def update_post(
     data = payload.model_dump(exclude_unset=True)
     if "tags" in data:
         post.tags = await _resolve_tags(db, data.pop("tags") or [])
-    if "title" in data:
-        post.slug = await _unique_slug(db, data["title"], ignore_id=post.id)
+    # The slug is deliberately left untouched: renaming a post must not break
+    # existing links or anything already shared.
     for key, value in data.items():
         setattr(post, key, value)
 

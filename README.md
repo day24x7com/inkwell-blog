@@ -108,6 +108,70 @@ grace / password123
 | DELETE | `/api/posts/{slug}/comments/{id}` | ✔ | Delete own comment |
 | GET | `/api/health` | — | Liveness probe |
 
+## Deploying
+
+### Docker Compose (single host / VPS)
+
+```bash
+cp backend/.env.example .env          # then edit SECRET_KEY, POSTGRES_PASSWORD
+docker compose up -d --build
+docker compose exec api python seed.py   # optional demo data
+```
+
+Frontend on `:8081`, API on `:8080`. nginx serves the SPA and proxies `/api` to
+the `api` service, so there is no CORS preflight in production.
+
+### Images
+
+`.github/workflows/docker.yml` publishes two images to GHCR on every push to
+`main` and on `v*` tags:
+
+- `ghcr.io/day24x7com/inkwell-api`
+- `ghcr.io/day24x7com/inkwell-web`
+
+### Managed platforms
+
+The two tiers deploy independently:
+
+| Tier | Suggested host | Notes |
+| --- | --- | --- |
+| API | Railway / Render / Fly.io | Use `backend/Dockerfile`; add a managed PostgreSQL and set `DATABASE_URL` |
+| Web | Vercel / Netlify / Cloudflare Pages | Build `frontend`, output `dist/frontend/browser` |
+
+When the web tier lives on a different origin than the API, point it at the
+backend by editing `frontend/public/config.js` (served at `/config.js`):
+
+```js
+window.__INKWELL_API__ = 'https://your-api-host.example.com/api';
+```
+
+Add that origin to `CORS_ORIGINS` on the API.
+
+### Required environment
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | `postgresql+asyncpg://user:pass@host:5432/db` |
+| `SECRET_KEY` | JWT signing key — `python -c "import secrets;print(secrets.token_urlsafe(48))"` |
+| `CORS_ORIGINS` | Comma-separated allowed browser origins |
+| `ACCESS_TOKEN_EXPIRE_MINUTES` | Token lifetime, default `1440` |
+
+## CI
+
+`.github/workflows/ci.yml` runs on every push and PR:
+
+- **Backend** — ruff lint, boots the API against a PostgreSQL 17 service
+  container, then runs `scripts/smoke_test.py` (26 assertions covering auth,
+  CRUD, slug stability, filters, comments and the 401 boundary).
+- **Frontend** — `npm ci` + production build.
+
+Run the smoke test locally against a running server:
+
+```bash
+cd backend
+API_URL=http://127.0.0.1:8080/api ./.venv/bin/python -m scripts.smoke_test
+```
+
 ## Notes
 
 - Tables are created on startup via `Base.metadata.create_all`. For schema
