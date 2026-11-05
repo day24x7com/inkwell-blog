@@ -1,0 +1,269 @@
+:root {
+  --paper: #fdfcf9;
+  --paper-2: #f6f3ec;
+  --ink: #1a1a1a;
+  --ink-soft: #5c5c5c;
+  --rule: #e5e0d5;
+  --accent: #b4441f;
+  --accent-soft: #f3e4dc;
+  --font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(26, 26, 26, 0.04), 0 8px 24px -12px rgba(26, 26, 26, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 17px;
+  line-height: 1.65;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.wrap {
+  width: min(1080px, 100% - 3rem);
+  margin-inline: auto;
+}
+
+.wrap-narrow {
+  width: min(720px, 100% - 3rem);
+  margin-inline: auto;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.05rem;
+  border-radius: 999px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.88rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease, background 0.12s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+
+.btn-ghost:hover {
+  border-color: var(--ink);
+  background: var(--paper-2);
+}
+
+.btn-quiet {
+  background: transparent;
+  color: var(--ink-soft);
+  border-color: transparent;
+  padding-inline: 0.5rem;
+}
+
+.btn-quiet:hover {
+  color: var(--accent);
+  background: transparent;
+}
+
+.btn-accent {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+
+.field label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+input[type='text'],
+input[type='email'],
+input[type='password'],
+textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  font-family: inherit;
+  font-size: 1rem;
+  color: var(--ink);
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.card {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+}
+
+.tag {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.error {
+  color: #a3241b;
+  background: #fdeceb;
+  border: 1px solid #f5cfcc;
+  padding: 0.6rem 0.85rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.empty {
+  text-align: center;
+  padding: 4rem 1rem;
+  color: var(--ink-soft);
+}
+
+.empty h2 {
+  font-family: var(--font-display);
+  color: var(--ink);
+}
+
+.prose {
+  font-size: 1.075rem;
+  line-height: 1.78;
+}
+
+.prose h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin: 2.4rem 0 0.8rem;
+  letter-spacing: -0.01em;
+}
+
+.prose h3 {
+  font-size: 1.15rem;
+  margin: 1.8rem 0 0.6rem;
+}
+
+.prose p {
+  margin: 0 0 1.15rem;
+}
+
+.prose ul {
+  margin: 0 0 1.15rem;
+  padding-left: 1.3rem;
+}
+
+.prose li {
+  margin-bottom: 0.35rem;
+}
+
+.prose pre {
+  background: #1e1e1e;
+  color: #eaeaea;
+  padding: 1rem 1.15rem;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  font-size: 0.88rem;
+  margin: 0 0 1.3rem;
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--paper-2);
+  padding: 0.12em 0.35em;
+  border-radius: 4px;
+}
+
+.prose pre code {
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose blockquote {
+  border-left: 3px solid var(--accent);
+  margin: 0 0 1.2rem;
+  padding-left: 1rem;
+  color: var(--ink-soft);
+  font-style: italic;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.3rem;
+  font-size: 0.92rem;
+}
+
+.prose th,
+.prose td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.prose th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+}
+
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--rule);
+  margin: 2rem 0;
+}

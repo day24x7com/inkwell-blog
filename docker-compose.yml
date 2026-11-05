@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-blog}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-blogpass}
+      POSTGRES_DB: ${POSTGRES_DB:-blogdb}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER:-blog} -d ${POSTGRES_DB:-blogdb}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-blog}:${POSTGRES_PASSWORD:-blogpass}@db:5432/${POSTGRES_DB:-blogdb}
+      SECRET_KEY: ${SECRET_KEY:?set SECRET_KEY in .env}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080}
+    ports:
+      - '${API_PORT:-8080}:8000'
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - '${WEB_PORT:-8081}:80'
+
+volumes:
+  pgdata:
